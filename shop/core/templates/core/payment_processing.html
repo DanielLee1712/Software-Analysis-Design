@@ -1,0 +1,269 @@
+{% extends "core/base.html" %}
+
+{% block title %}Chuyển Khoản - BookShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-container {
+        max-width: 700px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .payment-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #eee;
+    }
+    
+    .payment-icon {
+        font-size: 50px;
+        margin-bottom: 10px;
+    }
+    
+    .order-summary {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 30px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+        font-size: 14px;
+    }
+    
+    .summary-row.total {
+        font-size: 18px;
+        font-weight: bold;
+        color: #667eea;
+        border-top: 2px solid #ddd;
+        padding-top: 10px;
+        margin-top: 15px;
+    }
+    
+    .bank-info {
+        background: #e8f4f8;
+        padding: 20px;
+        border-radius: 5px;
+        border-left: 4px solid #667eea;
+        margin-bottom: 20px;
+    }
+    
+    .bank-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 12px 0;
+        font-size: 15px;
+    }
+    
+    .bank-info-row strong {
+        color: #333;
+        margin-right: 15px;
+    }
+    
+    .bank-info-row span {
+        text-align: right;
+        font-family: monospace;
+        font-weight: 500;
+    }
+    
+    .payment-form-group {
+        margin-bottom: 15px;
+    }
+    
+    .payment-form-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #333;
+    }
+    
+    .payment-form-group input,
+    .payment-form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    
+    .payment-form-group input:focus,
+    .payment-form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    
+    .payment-button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    
+    .payment-button-group button,
+    .payment-button-group a {
+        flex: 1;
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .payment-button-group .btn-confirm {
+        background: #667eea;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .payment-button-group .btn-confirm:hover {
+        background: #5568d3;
+    }
+    
+    .payment-button-group .btn-back {
+        background: #f0f0f0;
+        color: #333;
+    }
+    
+    .payment-button-group .btn-back:hover {
+        background: #e0e0e0;
+    }
+    
+    .payment-security {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .security-icon {
+        font-size: 20px;
+        margin-right: 5px;
+    }
+    
+    .instruction-box {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .instruction-box strong {
+        color: #856404;
+    }
+    
+    .payment-method-box {
+        background: #f5f5f5;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .payment-method-header {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-header">
+        <div class="payment-icon">🏦</div>
+        <h2>Chuyển Khoản Ngân Hàng</h2>
+        <p>Vui lòng chuyển khoản theo thông tin dưới đây</p>
+    </div>
+    
+    <!-- Order Summary -->
+    <div class="order-summary">
+        <h3 style="margin-top: 0;">Tóm Tắt Đơn Hàng</h3>
+        {% for item in cart_items %}
+            <div class="summary-row">
+                <span>{{ item.book.title }} x{{ item.quantity }}</span>
+                <span>{{ item.book.price|floatformat:0 }} ₫</span>
+            </div>
+        {% endfor %}
+        <div class="summary-row total">
+            <span>Tổng cộng:</span>
+            <span>{{ total_price|floatformat:0 }} ₫</span>
+        </div>
+    </div>
+    
+    <!-- Bank Transfer Info -->
+    <div class="instruction-box">
+        <strong>⚠️ Lưu ý:</strong> Đơn hàng sẽ được xác nhận sau khi nhận được chuyển khoản. Vui lòng chuyển khoản trong vòng 24 giờ.
+    </div>
+    
+    <div class="bank-info">
+        <div class="bank-info-row">
+            <strong>Tên Ngân Hàng:</strong>
+            <span>Techcombank</span>
+        </div>
+        <div class="bank-info-row">
+            <strong>Số Tài Khoản:</strong>
+            <span>1234567890</span>
+        </div>
+        <div class="bank-info-row">
+            <strong>Chủ Tài Khoản:</strong>
+            <span>BookShop Store</span>
+        </div>
+        <div class="bank-info-row" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #b3dfe8;">
+            <strong>Số Tiền:</strong>
+            <span style="color: #667eea; font-weight: bold; font-size: 16px;">{{ total_price|floatformat:0 }} ₫</span>
+        </div>
+    </div>
+    
+    <!-- Payment Form -->
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="payment-method-box">
+            <div class="payment-method-header">
+                🏦 Xác Nhận Thanh Toán
+            </div>
+            
+            <div class="payment-form-group">
+                <label for="transfer_ref">Mã tham chiếu (Nội dung chuyển khoản - tùy chọn)</label>
+                <input type="text" id="transfer_ref" name="transfer_ref" placeholder="Nhập mã tham chiếu hoặc để trống">
+            </div>
+            
+            <div class="payment-form-group">
+                <label for="payment_status">Tình trạng thanh toán:</label>
+                <select id="payment_status" name="payment_status">
+                    <option value="completed">✓ Đã chuyển khoản</option>
+                    <option value="pending">⏳ Chưa chuyển - Sẽ chuyển sau</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="payment-button-group">
+            <a href="{% url 'core:checkout' %}" class="btn-back">← Quay lại</a>
+            <button type="submit" class="btn-confirm">✓ Xác Nhận</button>
+        </div>
+    </form>
+    
+    <!-- Security Info -->
+    <div class="payment-security">
+        <span class="security-icon">🔒</span> Thông tin thanh toán của bạn được bảo vệ
+    </div>
+</div>
+{% endblock %}

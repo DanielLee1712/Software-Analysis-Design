@@ -22,6 +22,7 @@ urlpatterns = [
     
     # Checkout & Order routes
     path('checkout/', views.checkout, name='checkout'),
+    path('payment/processing/', views.payment_processing, name='payment_processing'),
     path('order/confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
     
     # Rating routes

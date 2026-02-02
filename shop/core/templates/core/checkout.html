@@ -86,24 +86,8 @@
     
     <form method="POST">
         {% csrf_token %}
-        
-        <h3>Phương thức thanh toán</h3>
-        <div class="payment-methods">
-            <div class="payment-method">
-                <input type="radio" name="payment_method" value="credit_card" id="credit" checked>
-                <label for="credit">💳 Thẻ tín dụng / Ghi nợ</label>
-            </div>
-            <div class="payment-method">
-                <input type="radio" name="payment_method" value="bank_transfer" id="bank">
-                <label for="bank">🏦 Chuyển khoản ngân hàng</label>
-            </div>
-            <div class="payment-method">
-                <input type="radio" name="payment_method" value="ewallet" id="wallet">
-                <label for="wallet">💰 Ví điện tử</label>
-            </div>
-        </div>
-        
-        <button type="submit" class="btn checkout-btn">✓ Xác nhận thanh toán</button>
+        <input type="hidden" name="payment_method" value="bank_transfer">
+        <button type="submit" class="btn checkout-btn">✓ Tiếp tục thanh toán</button>
     </form>
     
     <a href="{% url 'core:cart_view' %}" style="display: block; text-align: center; margin-top: 20px; color: #667eea; text-decoration: none;">← Quay lại giỏ hàng</a>

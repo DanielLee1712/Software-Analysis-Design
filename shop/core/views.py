@@ -295,7 +295,7 @@ def remove_from_cart(request, cart_item_id):
 
 
 def checkout(request):
-    """Handle order checkout and payment"""
+    """Handle order checkout and payment method selection"""
     if 'customer_id' not in request.session:
         return redirect('core:login')
     
@@ -308,6 +308,43 @@ def checkout(request):
             return redirect('core:cart_view')
         
         if request.method == 'POST':
+            # Bank transfer only
+            request.session['payment_method'] = 'bank_transfer'
+            request.session.modified = True
+            return redirect('core:payment_processing')
+        
+        total_price = sum(item.book.price * item.quantity for item in cart_items)
+        
+        context = get_context(request)
+        context.update({
+            'cart_items': cart_items,
+            'total_price': total_price,
+            'customer': customer,
+        })
+        
+        return render(request, 'core/checkout.html', context)
+    
+    except (Customer.DoesNotExist, Cart.DoesNotExist):
+        return redirect('core:login')
+
+
+def payment_processing(request):
+    """Process payment and create order"""
+    if 'customer_id' not in request.session:
+        return redirect('core:login')
+    
+    try:
+        customer = Customer.objects.get(id=request.session['customer_id'])
+        cart = Cart.objects.get(customer=customer, is_active=True)
+        cart_items = CartItem.objects.filter(cart=cart)
+        
+        if not cart_items.exists():
+            return redirect('core:cart_view')
+        
+        if request.method == 'POST':
+            payment_method = request.session.get('payment_method', 'credit_card')
+            payment_status = request.POST.get('payment_status', 'completed')
+            
             try:
                 address = customer.address
             except Address.DoesNotExist:
@@ -327,8 +364,7 @@ def checkout(request):
             payment = Payment.objects.create(
                 order=order,
                 amount=total_price,
-                payment_method=request.POST.get('payment_method', 'credit_card'),
-                status='pending'
+                status=payment_status
             )
             
             # Create order history
@@ -341,6 +377,11 @@ def checkout(request):
             cart.is_active = False
             cart.save()
             
+            # Clear session payment method
+            if 'payment_method' in request.session:
+                del request.session['payment_method']
+            request.session.modified = True
+            
             return redirect('core:order_confirmation', order_id=order.id)
         
         total_price = sum(item.book.price * item.quantity for item in cart_items)
@@ -352,7 +393,7 @@ def checkout(request):
             'customer': customer,
         })
         
-        return render(request, 'core/checkout.html', context)
+        return render(request, 'core/payment_processing.html', context)
     
     except (Customer.DoesNotExist, Cart.DoesNotExist):
         return redirect('core:login')
@@ -378,6 +419,8 @@ def order_confirmation(request, order_id):
         return render(request, 'core/order_confirmation.html', context)
     
     except (Order.DoesNotExist, Customer.DoesNotExist):
+        return redirect('core:login')
+
         return redirect('core:login')
 
 
