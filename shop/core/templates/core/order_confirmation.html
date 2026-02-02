@@ -71,16 +71,12 @@
             <span>#{{ order.id }}</span>
         </div>
         <div class="info-row">
-            <span><strong>Ngày đặt:</strong></span>
-            <span>{{ order.created_date|default:"Hôm nay" }}</span>
-        </div>
-        <div class="info-row">
             <span><strong>Tổng tiền:</strong></span>
             <span style="color: #667eea; font-weight: bold;">{{ order.total_price|floatformat:0 }} ₫</span>
         </div>
         <div class="info-row">
             <span><strong>Trạng thái:</strong></span>
-            <span style="color: #ffc107; font-weight: bold;">{{ order.get_status_display }}</span>
+            <span style="color: #ffc107; font-weight: bold;">{{ order.status }}</span>
         </div>
     </div>
     

@@ -8,7 +8,7 @@ from core.dao.customer_dao import CustomerDAO
 from core.dao.cart_dao import CartDAO
 from core.models import (
     Customer, Book, Category, Rating, Wishlist, WishlistItem,
-    Order, CartItem, Payment, Cart
+    Order, CartItem, Payment, Cart, Address, OrderHistory
 )
 from datetime import datetime
 import json
@@ -308,7 +308,11 @@ def checkout(request):
             return redirect('core:cart_view')
         
         if request.method == 'POST':
-            address = customer.address
+            try:
+                address = customer.address
+            except Address.DoesNotExist:
+                address = None
+            
             total_price = sum(item.book.price * item.quantity for item in cart_items)
             
             # Create order
@@ -325,6 +329,12 @@ def checkout(request):
                 amount=total_price,
                 payment_method=request.POST.get('payment_method', 'credit_card'),
                 status='pending'
+            )
+            
+            # Create order history
+            OrderHistory.objects.create(
+                customer=customer,
+                order=order
             )
             
             # Clear cart
