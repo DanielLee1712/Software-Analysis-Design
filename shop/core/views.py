@@ -202,11 +202,11 @@ def add_to_cart(request, book_id):
         customer = Customer.objects.get(id=request.session['customer_id'])
         book = Book.objects.get(id=book_id)
         
-        # Get or create active cart
-        cart, created = Cart.objects.get_or_create(
-            customer=customer,
-            is_active=True
-        )
+        # Get customer's cart (create if doesn't exist, or reactivate if inactive)
+        cart = Cart.objects.get(customer=customer)
+        if not cart.is_active:
+            cart.is_active = True
+            cart.save()
         
         quantity = int(request.POST.get('quantity', 1))
         
@@ -236,10 +236,13 @@ def cart_view(request):
     
     try:
         customer = Customer.objects.get(id=request.session['customer_id'])
-        cart, created = Cart.objects.get_or_create(
-            customer=customer,
-            is_active=True
-        )
+        cart = Cart.objects.get(customer=customer)
+        
+        # Reactivate cart if it was inactive
+        if not cart.is_active:
+            cart.is_active = True
+            cart.save()
+        
         cart_items = CartItem.objects.filter(cart=cart).select_related('book')
         
         total_price = sum(item.book.price * item.quantity for item in cart_items)
