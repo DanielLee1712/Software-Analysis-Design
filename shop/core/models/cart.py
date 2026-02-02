@@ -6,6 +6,7 @@ class Cart(models.Model):
     """Cart model representing a shopping cart for a customer"""
     id = models.AutoField(primary_key=True)
     customer = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='cart')
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

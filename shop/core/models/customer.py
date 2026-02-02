@@ -7,7 +7,11 @@ class Customer(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    address = models.ForeignKey('Address', on_delete=models.SET_NULL, null=True, blank=True)
+    membership_level = models.ForeignKey('MembershipLevel', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    loyalty_points = models.IntegerField(default=0)
 
     class Meta:
         app_label = 'core'

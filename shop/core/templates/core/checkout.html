@@ -1,0 +1,111 @@
+{% extends "core/base.html" %}
+
+{% block title %}Thanh Toán - BookShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .order-items {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #eee;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+    
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 20px;
+        font-weight: bold;
+        color: #667eea;
+        margin: 20px 0;
+    }
+    
+    .payment-methods {
+        margin: 20px 0;
+    }
+    
+    .payment-method {
+        margin-bottom: 12px;
+    }
+    
+    .payment-method input {
+        margin-right: 10px;
+    }
+    
+    .checkout-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 30px;">💳 Thanh toán đơn hàng</h2>
+
+<div class="checkout-container">
+    <h3>Thông tin đơn hàng</h3>
+    
+    <div class="order-items">
+        {% for item in cart_items %}
+            <div class="order-item">
+                <span>{{ item.book.title }} x{{ item.quantity }}</span>
+                <span>{{ item.book.price|floatformat:0|add:item.quantity|multiply:item.book.price }} ₫</span>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="order-total">
+        <span>Tổng cộng:</span>
+        <span>{{ total_price|floatformat:0 }} ₫</span>
+    </div>
+    
+    <h3 style="margin-top: 30px;">Địa chỉ giao hàng</h3>
+    <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <p><strong>{{ customer.name }}</strong></p>
+        <p>{{ customer.address.street }}</p>
+        <p>{{ customer.address.city }}, {{ customer.address.province }}</p>
+        <p>Điện thoại: {{ customer.phone }}</p>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <h3>Phương thức thanh toán</h3>
+        <div class="payment-methods">
+            <div class="payment-method">
+                <input type="radio" name="payment_method" value="credit_card" id="credit" checked>
+                <label for="credit">💳 Thẻ tín dụng / Ghi nợ</label>
+            </div>
+            <div class="payment-method">
+                <input type="radio" name="payment_method" value="bank_transfer" id="bank">
+                <label for="bank">🏦 Chuyển khoản ngân hàng</label>
+            </div>
+            <div class="payment-method">
+                <input type="radio" name="payment_method" value="ewallet" id="wallet">
+                <label for="wallet">💰 Ví điện tử</label>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn checkout-btn">✓ Xác nhận thanh toán</button>
+    </form>
+    
+    <a href="{% url 'core:cart_view' %}" style="display: block; text-align: center; margin-top: 20px; color: #667eea; text-decoration: none;">← Quay lại giỏ hàng</a>
+</div>
+{% endblock %}
