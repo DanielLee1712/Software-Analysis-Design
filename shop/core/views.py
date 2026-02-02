@@ -202,11 +202,16 @@ def add_to_cart(request, book_id):
         customer = Customer.objects.get(id=request.session['customer_id'])
         book = Book.objects.get(id=book_id)
         
-        # Get customer's cart (create if doesn't exist, or reactivate if inactive)
-        cart = Cart.objects.get(customer=customer)
-        if not cart.is_active:
-            cart.is_active = True
-            cart.save()
+        # Get or create customer's cart
+        try:
+            cart = Cart.objects.get(customer=customer)
+            # Reactivate if inactive
+            if not cart.is_active:
+                cart.is_active = True
+                cart.save()
+        except Cart.DoesNotExist:
+            # Create new cart for customer
+            cart = Cart.objects.create(customer=customer, is_active=True)
         
         quantity = int(request.POST.get('quantity', 1))
         
@@ -236,12 +241,17 @@ def cart_view(request):
     
     try:
         customer = Customer.objects.get(id=request.session['customer_id'])
-        cart = Cart.objects.get(customer=customer)
         
-        # Reactivate cart if it was inactive
-        if not cart.is_active:
-            cart.is_active = True
-            cart.save()
+        # Get or create customer's cart
+        try:
+            cart = Cart.objects.get(customer=customer)
+            # Reactivate if inactive
+            if not cart.is_active:
+                cart.is_active = True
+                cart.save()
+        except Cart.DoesNotExist:
+            # Create new cart for customer
+            cart = Cart.objects.create(customer=customer, is_active=True)
         
         cart_items = CartItem.objects.filter(cart=cart).select_related('book')
         
