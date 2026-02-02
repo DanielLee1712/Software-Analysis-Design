@@ -201,7 +201,12 @@ def add_to_cart(request, book_id):
     try:
         customer = Customer.objects.get(id=request.session['customer_id'])
         book = Book.objects.get(id=book_id)
-        cart = Cart.objects.get(customer=customer, is_active=True)
+        
+        # Get or create active cart
+        cart, created = Cart.objects.get_or_create(
+            customer=customer,
+            is_active=True
+        )
         
         quantity = int(request.POST.get('quantity', 1))
         
@@ -220,7 +225,7 @@ def add_to_cart(request, book_id):
         
         return redirect('core:book_detail', book_id=book_id)
     
-    except (Customer.DoesNotExist, Book.DoesNotExist, Cart.DoesNotExist):
+    except (Customer.DoesNotExist, Book.DoesNotExist):
         return redirect('core:login')
 
 
@@ -231,7 +236,10 @@ def cart_view(request):
     
     try:
         customer = Customer.objects.get(id=request.session['customer_id'])
-        cart = Cart.objects.get(customer=customer, is_active=True)
+        cart, created = Cart.objects.get_or_create(
+            customer=customer,
+            is_active=True
+        )
         cart_items = CartItem.objects.filter(cart=cart).select_related('book')
         
         total_price = sum(item.book.price * item.quantity for item in cart_items)
@@ -245,7 +253,7 @@ def cart_view(request):
         
         return render(request, 'core/cart.html', context)
     
-    except (Customer.DoesNotExist, Cart.DoesNotExist):
+    except Customer.DoesNotExist:
         return redirect('core:login')
 
 
