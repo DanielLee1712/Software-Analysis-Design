@@ -173,10 +173,10 @@
                         </form>
                     </div>
                     <div class="item-price">
-                        {{ item.book.price|floatformat:0|add:item.quantity|multiply:item.book.price }} ₫
+                        {% widthratio item.book.price 1 item.quantity %} ₫
                     </div>
                     <div class="item-actions">
-                        <form method="POST" action="{% url 'core:remove_from_cart' item.id %}}" style="display:inline;">
+                        <form method="POST" action="{% url 'core:remove_from_cart' item.id %}" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit">🗑️</button>
                         </form>
