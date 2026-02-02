@@ -205,8 +205,9 @@ def add_to_cart(request, book_id):
         # Get or create customer's cart
         try:
             cart = Cart.objects.get(customer=customer)
-            # Reactivate if inactive
+            # Reactivate if inactive and clear old items
             if not cart.is_active:
+                CartItem.objects.filter(cart=cart).delete()
                 cart.is_active = True
                 cart.save()
         except Cart.DoesNotExist:
@@ -245,8 +246,9 @@ def cart_view(request):
         # Get or create customer's cart
         try:
             cart = Cart.objects.get(customer=customer)
-            # Reactivate if inactive
+            # Reactivate if inactive and clear old items
             if not cart.is_active:
+                CartItem.objects.filter(cart=cart).delete()
                 cart.is_active = True
                 cart.save()
         except Cart.DoesNotExist:
